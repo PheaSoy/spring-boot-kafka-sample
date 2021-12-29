@@ -1,6 +1,7 @@
 package org.soyphea.kafkasample.producer;
 
 import lombok.extern.slf4j.Slf4j;
+import org.soyphea.kafkasample.domain.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,20 +15,17 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 public class MyProducer {
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaTemplate<String, Event> kafkaTemplate;
 
-    @Value(value = "${kafka.topic}")
-    private String topicName;
+    public void sendMessage(String topicName, Event message) {
 
-    public void sendMessage(String message) {
-
-        ListenableFuture<SendResult<String, String>> future =
+        ListenableFuture<SendResult<String, Event>> future =
                 kafkaTemplate.send(topicName, message);
 
-        future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
+        future.addCallback(new ListenableFutureCallback<SendResult<String, Event>>() {
 
             @Override
-            public void onSuccess(SendResult<String, String> result) {
+            public void onSuccess(SendResult<String, Event> result) {
                 log.info("Sent message = {} with offset : {}",message,result.getRecordMetadata().offset());
             }
             @Override
